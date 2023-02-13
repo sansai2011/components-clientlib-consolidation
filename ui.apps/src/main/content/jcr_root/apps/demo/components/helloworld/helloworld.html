@@ -13,6 +13,11 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */-->
+<sly data-sly-use.clientLib="${'/libs/granite/sightly/templates/clientlib.html'}">
+    <meta data-sly-unwrap
+          data-sly-call="${clientLib.css @ categories=['demo.components.helloworld']}">
+    </meta>
+</sly>
 <div class="cmp-helloworld" data-cmp-is="helloworld">
     <h2 class="cmp-helloworld__title">Hello World Component</h2>
     <div class="cmp-helloworld__item" data-sly-test="${properties.text}">
@@ -24,3 +29,8 @@
         <pre class="cmp-helloworld__item-output"data-cmp-hook-helloworld="model">${model.message}</pre>
     </div>
 </div>
+<button onclick="myFunction()">Try it</button>
+<sly data-sly-use.clientLib="${'/libs/granite/sightly/templates/clientlib.html'}">
+    <meta data-sly-unwrap data-sly-call="${clientLib.js @ categories=['demo.components.helloworld']}">
+    </meta>
+</sly>
