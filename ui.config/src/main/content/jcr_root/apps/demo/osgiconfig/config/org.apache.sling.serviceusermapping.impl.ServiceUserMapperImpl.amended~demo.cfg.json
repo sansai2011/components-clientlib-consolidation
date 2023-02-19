@@ -1,0 +1,5 @@
+{
+  "user.mapping":[
+    "demo.core:consolidate-clientlibs-service=demo-service-user"
+  ]
+}

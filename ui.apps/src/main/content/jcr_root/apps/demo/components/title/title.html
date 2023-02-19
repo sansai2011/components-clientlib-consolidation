@@ -1,8 +1,10 @@
+<!--/*
 <sly data-sly-use.clientLib="${'/libs/granite/sightly/templates/clientlib.html'}">
     <meta data-sly-unwrap
           data-sly-call="${clientLib.css @ categories=['demo.components.title']}">
     </meta>
 </sly>
+*/-->
 <div data-sly-use.title="com.adobe.cq.wcm.core.components.models.Title"
      data-sly-use.template="core/wcm/components/commons/v1/templates.html"
      data-sly-test.text="${title.text}"
@@ -17,7 +19,9 @@
 </div>
 <sly data-sly-call="${template.placeholder @ isEmpty=!text, classAppend='cmp-title'}"></sly>
 <button onclick="myTitle()">Try it</button>
+<!--/*
 <sly data-sly-use.clientLib="${'/libs/granite/sightly/templates/clientlib.html'}">
     <meta data-sly-unwrap data-sly-call="${clientLib.js @ categories=['demo.components.title']}">
     </meta>
 </sly>
+*/-->

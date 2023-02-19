@@ -2,6 +2,9 @@
     "scripts": [
         "create path (sling:OrderedFolder) /content/dam/demo",
         "create path (nt:unstructured) /content/dam/demo/jcr:content",
-        "set properties on /content/dam/demo/jcr:content\n  set cq:conf{String} to /conf/demo\n  set jcr:title{String} to \"Demo\"\nend"
+        "set properties on /content/dam/demo/jcr:content\n  set cq:conf{String} to /conf/demo\n  set jcr:title{String} to \"Demo\"\nend",
+
+        "create service user demo-service-user with path /home/users/system/demo",
+        "set ACL for demo-service-user\n\tallow jcr:read on /apps\n\tallow jcr:read,rep:write on /etc/clientlibs\n\tallow jcr:read on /content\nend"
     ]
 }
