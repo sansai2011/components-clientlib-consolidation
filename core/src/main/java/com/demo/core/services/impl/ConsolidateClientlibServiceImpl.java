@@ -171,6 +171,10 @@ public class ConsolidateClientlibServiceImpl implements ConsolidateClientlibServ
             log.error("Failed to retrieve properties", e);
         } catch (PersistenceException e) {
             log.error("Failed to create counter folder {}", e.getMessage(), e);
+        } finally {
+            if (resourceResolver != null && resourceResolver.isLive()) {
+                resourceResolver.close();
+            }
         }
     }
 
