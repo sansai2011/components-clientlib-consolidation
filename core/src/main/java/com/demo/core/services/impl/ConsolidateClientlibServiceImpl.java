@@ -14,6 +14,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import javax.jcr.RepositoryException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,10 @@ public class ConsolidateClientlibServiceImpl implements ConsolidateClientlibServ
     private final String CLIENTLIB_FOLDER = "clientlibs";
     private final String CLIENTLIB_ROOT_FOLDER = "/etc/clientlibs/demo/clientlib-";
     private final String CLIENTLIB_CATEGORIES = "categories";
-    private final String CLIENTLIB_DEPENDENCIES = "dependencies";
+    private final String CLIENTLIB_EMBED = "embed";
     private static final String SLASH = "/";
+    private static final String JS_TXT_FILE = "js.txt";
+    private static final String CSS_TXT_FILE = "css.txt";
 
     private ResourceResolver getServiceResourceResolver() throws LoginException {
         return resolverFactory.getServiceResourceResolver(Collections.singletonMap(
@@ -62,6 +65,20 @@ public class ConsolidateClientlibServiceImpl implements ConsolidateClientlibServ
             String componentName = resourceType.substring(resourceType.lastIndexOf(SLASH) + 1);
             Resource source = ResourceUtil.getOrCreateResource(resourceResolver, CLIENTLIB_ROOT_FOLDER + currentPage.getName(),
                     defaultProps, null, false);
+
+            Map<String, Object> props = new HashMap<>();
+            props.put(JcrConstants.JCR_PRIMARYTYPE, JcrConstants.NT_RESOURCE);
+            props.put(JcrConstants.JCR_DATA, InputStream.class);
+
+            if (Objects.isNull(source.getChild(JS_TXT_FILE))) {
+                Resource jsResource = resourceResolver.create(source, JS_TXT_FILE, Collections.singletonMap(JcrConstants.JCR_PRIMARYTYPE, JcrConstants.NT_FILE));
+                resourceResolver.create(jsResource, JcrConstants.JCR_CONTENT, props);
+            }
+            if (Objects.isNull(source.getChild(CSS_TXT_FILE))) {
+                Resource cssResource = resourceResolver.create(source, CSS_TXT_FILE, Collections.singletonMap(JcrConstants.JCR_PRIMARYTYPE, JcrConstants.NT_FILE));
+                resourceResolver.create(cssResource, JcrConstants.JCR_CONTENT, props);
+            }
+
             Resource sourceComponent = resourceResolver.getResource(resourceType + SLASH + CLIENTLIB_FOLDER);
 
             if (Objects.nonNull(sourceComponent)) {
@@ -72,12 +89,12 @@ public class ConsolidateClientlibServiceImpl implements ConsolidateClientlibServ
                 if (modValueMap != null) {
                     int count = 1;
                     Set<String> sourceProps = getProps(sourceComponent, CLIENTLIB_CATEGORIES);
-                    if (!modValueMap.containsKey(CLIENTLIB_DEPENDENCIES)) {
-                        modValueMap.putIfAbsent(CLIENTLIB_DEPENDENCIES, sourceProps.toArray());
+                    if (!modValueMap.containsKey(CLIENTLIB_EMBED)) {
+                        modValueMap.putIfAbsent(CLIENTLIB_EMBED, sourceProps.toArray());
                         modValueMap.putIfAbsent(componentName, count);
                     } else {
-                        Set<String> destProps = getProps(source, CLIENTLIB_DEPENDENCIES);
-                        modValueMap.replace(CLIENTLIB_DEPENDENCIES, SetUtils.union(sourceProps, destProps).toArray());
+                        Set<String> destProps = getProps(source, CLIENTLIB_EMBED);
+                        modValueMap.replace(CLIENTLIB_EMBED, SetUtils.union(sourceProps, destProps).toArray());
                         if (modValueMap.containsKey(componentName)) {
                             Long getCount = (Long) modValueMap.get(componentName);
                             modValueMap.replace(componentName, getCount + 1);
@@ -136,13 +153,13 @@ public class ConsolidateClientlibServiceImpl implements ConsolidateClientlibServ
                     log.error("No write access: Unable to store resource data to {}", resource.getPath() + ".");
                 }
                 if (modValueMap != null) {
-                    Set<String> destProps = getProps(resource, CLIENTLIB_DEPENDENCIES);
+                    Set<String> destProps = getProps(resource, CLIENTLIB_EMBED);
                     Long getCount = (Long) modValueMap.get(componentName);
                     if (getCount != null) {
                         modValueMap.replace(componentName, getCount - 1);
                         if (getCount <= 1) {
                             destProps.removeAll(sourceProps);
-                            modValueMap.replace(CLIENTLIB_DEPENDENCIES, destProps.toArray());
+                            modValueMap.replace(CLIENTLIB_EMBED, destProps.toArray());
                         }
                     }
                 }
