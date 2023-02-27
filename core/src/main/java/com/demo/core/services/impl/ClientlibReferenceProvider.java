@@ -70,15 +70,22 @@ public class ClientlibReferenceProvider implements ReferenceProvider {
         if (contextPage == null) {
             return Collections.emptyList();
         }
-        Resource clientLibResource = resolver.getResource(CLIENTLIB_ROOT_FOLDER + contextPage.getName());
-        Resource cssResource = resolver.getResource(CLIENTLIB_ROOT_FOLDER + contextPage.getName() + "/css.txt");
-        Resource jsLibResource = resolver.getResource(CLIENTLIB_ROOT_FOLDER + contextPage.getName() + "/js.txt");
 
         List<com.day.cq.wcm.api.reference.Reference> references = new ArrayList<>();
-        if (clientLibResource != null && !clientLibResource.getPath().equals(resource.getPath())) {
-            references.add(getReference(clientLibResource, contextPage));
-            references.add(getReference(cssResource, contextPage));
-            references.add(getReference(jsLibResource, contextPage));
+        try {
+            String clientLibPath = CLIENTLIB_ROOT_FOLDER + "/" + contextPage.getAbsoluteParent(1)
+                    .getName() + "/" + "clientlib-" + contextPage.getName();
+            Resource clientLibResource = resolver.getResource(clientLibPath);
+            Resource cssResource = resolver.getResource(clientLibPath + "/css.txt");
+            Resource jsLibResource = resolver.getResource(clientLibPath + "/js.txt");
+
+            if (clientLibResource != null && !clientLibResource.getPath().equals(resource.getPath())) {
+                references.add(getReference(clientLibResource, contextPage));
+                references.add(getReference(cssResource, contextPage));
+                references.add(getReference(jsLibResource, contextPage));
+            }
+        } catch (NullPointerException e) {
+            log.error("Null Pointer Exception at {}", contextPage);
         }
         log.debug("Found {} references for resource {}", references.size(), resource.getPath());
         return references;

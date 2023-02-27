@@ -22,8 +22,7 @@ public class PageGroupClientlibPostProcessor implements SlingPostProcessor {
                 getValue(":operation"));
         if (operation.equalsIgnoreCase("delete")) {
             consolidateClientlibService.delete(request);
-        }
-        if (request.getRequestParameterMap().
+        } else if (request.getRequestParameterMap().
                 getValue("./sling:resourceType") != null) {
             consolidateClientlibService.create(request);
         }
